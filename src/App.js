@@ -1,23 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { StoreTask, TaskList } from "./components";
+import { getTasks, createTask } from "./service";
+import "./App.css";
 
 function App() {
+  const [tasks, setTasks] = useState([]);
+
+  const [text, setText] = useState("");
+
+  const fetchTask = async () => {
+    const { tasks } = await getTasks();
+    setTasks(tasks);
+  };
+
+  const handleInputCange = (event) => {
+    console.log(event.target.value);
+    setText(event.target.value);
+  };
+
+  const fetchStore = async () => {
+    if (text === "") return;
+
+    await createTask({
+      text,
+      status: "TODO",
+    });
+
+    await fetchTask();
+
+    setText("");
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h2>Todo App</h2>
+      <StoreTask
+        fetchTask={fetchTask}
+        text={text}
+        handleInputCange={handleInputCange}
+        fetchStore={fetchStore}
+      />
+      <TaskList tasks={tasks} fetchTask={fetchTask} />
     </div>
   );
 }
